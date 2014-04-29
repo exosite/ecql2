@@ -1,0 +1,44 @@
+%%==============================================================================
+%% Copyright (c) Exosite LLC
+%%
+%% ecql.app - OTP-compliant Application Configuration File
+%%==============================================================================
+
+  {
+    application ,ecql ,[
+       {description ,"ecql"}
+      ,{vsn ,git}
+      ,{registered ,[
+         ecql
+        ,ecql_cache
+        ,ecql_etsman
+        ,ecql_sup
+      ]}
+      ,{mod, {ecql ,[]}}
+      ,{applications ,[
+         kernel
+        ,sasl
+        ,stdlib
+      ]}
+      ,{env, [
+         {cache_size, 1000000}
+        ,{cluster_module, erlang}
+        ,{log, disabled}
+        ,{user, "cassandra"}
+        ,{pass, "cassandra"}
+        ,{hosts, [
+           {{127,0,0,1}, 9042}
+        ]}
+        ,{keyspace, "ecql"}
+        ,{replication_strategy, "SimpleStrategy"}
+        ,{replication_factor, 2}
+        %,{replication_strategy, "NetworkTopologyStrategy"}
+        %,{replication_factor, [{"dc1", 3}, {"dc2", 2}]}
+        ,{streams_per_connection, 100}
+      ]}
+    ]
+  }
+.
+
+%%==============================================================================
+%% END OF FILE

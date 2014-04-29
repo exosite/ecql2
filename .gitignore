@@ -1,0 +1,10 @@
+*.beam
+.eunit/*
+/ebin/ecql.app
+*.o
+*.log
+*.so
+priv/
+erl_crash.dump
+cassandra.ip
+_build
