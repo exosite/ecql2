@@ -6,8 +6,8 @@
 
   {
     application ,ecql ,[
-       {description ,"ecql"}
-      ,{vsn ,git}
+       {description ,"Fastest Cassandra driver for Erlang (CQL3 native protocol v4)."}
+      ,{vsn ,"5.0.1"}
       ,{registered ,[
          ecql
         ,ecql_cache
@@ -36,6 +36,9 @@
         %,{replication_factor, [{"dc1", 3}, {"dc2", 2}]}
         ,{streams_per_connection, 100}
       ]}
+      ,{maintainers, ["Dominic Letz"]}
+      ,{licenses, ["MIT"]}
+      ,{links, [{"Github", "https://github.com/exosite/ecql2"}]}
     ]
   }
 .
