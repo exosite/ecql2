@@ -24,7 +24,7 @@ stop(_) ->
 %% TESTS START HERE
 large_batch_tests() ->
   Str = "roundandroundandroundandroundand",
-  Values = [[N, string:copies(Str, N)] || N <- lists:seq(1, 5000, 5)],
+  Values = [[N, string:copies(Str, N)] || N <- lists:seq(1, 1000, 5)],
   ok = ecql:execute_batch("INSERT INTO batch_test (a, b) VALUES(?, ?)", Values)
 .
 

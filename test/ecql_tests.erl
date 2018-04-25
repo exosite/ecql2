@@ -6,7 +6,7 @@ setup() ->
    SaslOpt = [{sasl_error_logger, {file, "sasl.log"}}]
   ,io:format("sasl~n")
   ,start_app(sasl, SaslOpt)
-  ,{ok, Ip} = file:read_file("./cassandra.ip")
+  ,{ok, Ip} = file:read_file(".eunit/cassandra.ip")
   ,{ok, Host} = inet_parse:address(string:chomp(binary_to_list(Ip)))
   ,EcqlOpt = [
     {replication_strategy, "SimpleStrategy"},
@@ -28,9 +28,9 @@ ecql_test_() ->
 tests() ->
   [
     %~ {generator, fun ecql_mnesia_unit:tests/0},
-    {generator, fun ecql_prepared_unit:tests/0}
-    %~ {generator, fun ecql_batch_unit:tests/0},
-    %~ {generator, fun ecql_types_unit:tests/0}
+    {generator, fun ecql_prepared_unit:tests/0},
+    {generator, fun ecql_batch_unit:tests/0},
+    {generator, fun ecql_types_unit:tests/0}
   ]
 .
 

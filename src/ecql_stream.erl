@@ -1189,6 +1189,9 @@ do_wire_value(_, undefined) ->
 do_wire_value(1, Value) when is_list(Value) or is_binary(Value) ->
   Value
 ;
+do_wire_value(1, Value) when is_atom(Value) ->
+  atom_to_binary(Value, utf8)
+;
 % 0x0002    Bigint
 do_wire_value(2, Value) ->
   wire_bigint(Value)
@@ -1247,6 +1250,9 @@ do_wire_value(16#C, Value) ->
 % 0x000D    Varchar
 do_wire_value(16#D, Value) when is_binary(Value) or is_list(Value) ->
   Value
+;
+do_wire_value(16#D, Value) when is_atom(Value) ->
+  atom_to_binary(Value, utf8)
 ;
 % 0x000E    Varint
 do_wire_value(16#E, Value) ->

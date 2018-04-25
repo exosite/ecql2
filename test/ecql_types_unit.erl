@@ -208,6 +208,10 @@ insert_read_test({Name, booleans, _Comment}) ->
 ;
 insert_read_test({Name, strings, _Comment}) ->
   insert_read(Name, [
+    {nil, <<"nil">>}
+  ]),
+  insert_read(Name, [
+    {list_to_atom("hello world"), <<"hello world">>},
     {"hello world", <<"hello world">>},
     <<"hello world">>
   ]),

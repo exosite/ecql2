@@ -7,7 +7,7 @@
   {
     application ,ecql ,[
        {description ,"Fastest Cassandra driver for Erlang (CQL3 native protocol v4)."}
-      ,{vsn ,"5.0.1"}
+      ,{vsn ,"5.0.2"}
       ,{registered ,[
          ecql
         ,ecql_cache
