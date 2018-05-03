@@ -127,7 +127,8 @@ handle_info({add_stream, Stream}, State = #state{
   ,waiting = Waiting
   ,host = Host
 }) ->
-  case queue:out(Waiting) of
+  erlang:garbage_collect(Stream)
+  ,case queue:out(Waiting) of
     {empty, Waiting}->
        {noreply, State#state{available = [Stream | Streams]}}
     ;
