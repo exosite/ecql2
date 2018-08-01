@@ -133,7 +133,7 @@ do_init_keyspace([Host | Hosts] ,Configuration) ->
   case ecql_connection:start_link(Host ,Configuration) of
     {ok, Connection} ->
        Keyspace = proplists:get_value(keyspace, Configuration, "ecql")
-      ,Factor = proplists:get_value(replication_factor, Configuration, 2)
+      ,Factor = proplists:get_value(replication_factor, Configuration, 3)
       ,Stream = ecql_connection:get_stream(Connection)
       ,Strategy = proplists:get_value(replication_strategy, Configuration, "SimpleStrategy")
       ,CQL = [
