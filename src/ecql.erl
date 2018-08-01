@@ -17,6 +17,7 @@
 % Compare default settings with CASSANDRA-5727
 -define(COMPACTION, "compaction = {'class': 'LeveledCompactionStrategy', 'sstable_size_in_mb': 160}").
 -define(RECONNECT_INTERVALL, 5000).
+-define(AUTODISCOVERY_INTERVALL, 30000).
 
 %% OTP application
 -export([start/2, stop/1]).
@@ -112,10 +113,13 @@ init(_) ->
 .
 do_init(State) ->
    Configuration = application:get_all_env()
-  ,Hosts = proplists:get_value(hosts, Configuration, [])
-  ,Configuration1 = do_init_keyspace(Hosts ,Configuration)
-  ,Connections = repair_connection_pool({}, Configuration1)
-  ,State#state{settings = Configuration1, clients = Connections}
+  ,Hosts = lists:sort(proplists:get_value(hosts, Configuration, []))
+  ,Configuration1 = lists:keystore(hosts, 1, Configuration, {hosts, Hosts})
+  ,Configuration2 = do_init_keyspace(Hosts ,Configuration1)
+  ,Connections = repair_connection_pool({}, Configuration2)
+  ,proplists:get_value(autodiscover, Configuration, true) andalso
+    spawn_monitor(fun() -> exit(autodiscover_peers()) end)
+  ,State#state{settings = Configuration2, clients = Connections}
 .
 do_init_keyspace([] ,Configuration) ->
   receive {config, Key, Value} ->
@@ -161,6 +165,25 @@ data_centers("NetworkTopologyStrategy", []) ->
 ;
 data_centers("NetworkTopologyStrategy" = S, [{Name, Factor} | Rest]) ->
   [", '", Name, "':", integer_to_list(Factor) | data_centers(S, Rest)]
+.
+
+
+%%------------------------------------------------------------------------------
+autodiscover_peers() ->
+  case catch begin
+     {_, [Row]} = ecql:select("SELECT cluster_name, data_center, rpc_address, partitioner, tokens FROM system.local")
+    ,[_ClusterName, DataCenter, Addr0, _Partitioner, _Token] = Row
+    ,{_, Peers} = ecql:select("SELECT rpc_address, tokens FROM system.peers WHERE data_center = ? ALLOW FILTERING", [DataCenter])
+    ,Hosts = lists:foldl(fun([Addr, _Tokens], List) ->
+       [{Addr, 9042} | List]
+     end, [{Addr0, 9042}], Peers)
+    ,{ok, Hosts}
+  end of 
+    {ok, H} -> {autodiscover, H};
+    Error ->
+      error_logger:error_msg("ecql: autodiscovery failed: ~p~n", [Error])
+     ,{autodiscover, []}
+  end
 .
 
 %%------------------------------------------------------------------------------
@@ -289,6 +312,24 @@ handle_info(
 ) ->
    Dirty orelse erlang:send_after(?RECONNECT_INTERVALL, self(), repair)
   ,{noreply, State#state{dirty = true}}
+;
+handle_info(autodiscover, State) ->
+   spawn_monitor(fun() -> exit(autodiscover_peers()) end)
+  ,{noreply, State}
+;
+handle_info(  
+  {'DOWN', _Ref, process, _Pid, {autodiscover, Update}}, State = #state{settings = Settings, dirty = Dirty}
+) ->
+   OldHosts = proplists:get_value(hosts, Settings, [])
+  ,erlang:send_after(?AUTODISCOVERY_INTERVALL, self(), autodiscover)
+  ,case Update of
+     [] -> {noreply, State};
+     OldHosts -> {noreply, State};
+     Hosts when is_list(Hosts) -> 
+         NewSettings = lists:keystore(hosts, 1, Settings, {hosts, lists:sort(Hosts)})
+        ,Dirty orelse (self() ! repair)
+        ,{noreply, State#state{settings = NewSettings, dirty = true}}
+   end
 ;
 handle_info(timeout, State) ->
    % Who timed out?

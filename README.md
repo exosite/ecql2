@@ -341,7 +341,6 @@ These can be configured from the application configuration file following OTP st
 * Document performance numbers vs. other drivers
 * SSL
 * Replace encode function with nif for performance.
-* Discover whole cluster automatically
 * Read configuration from env
 * Token aware routing
 * Support multiple keyspaces & clusters

@@ -29,6 +29,7 @@
         ,{hosts, [
            {{127,0,0,1}, 9042}
         ]}
+        ,{autodiscover, true}
         ,{keyspace, "ecql"}
         ,{replication_strategy, "SimpleStrategy"}
         ,{replication_factor, 2}
