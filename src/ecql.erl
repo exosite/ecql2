@@ -189,7 +189,7 @@ autodiscover_peers() ->
 %%------------------------------------------------------------------------------
 repair_connection_pool(OldPoolTuple, Configuration) ->
     ConnectionsPerHost = proplists:get_value(connections_per_host, Configuration, 1)
-   ,HostsList = lists:flatmap(fun(_)-> lists:map(fun(HostAddress) -> HostAddress end,
+   ,HostsList = lists:flatmap(fun(_) -> lists:map(fun(HostAddress) -> HostAddress end,
                                                 proplists:get_value(hosts, Configuration, []))
                              end,
                              lists:seq(1, ConnectionsPerHost))
