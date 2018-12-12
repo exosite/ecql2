@@ -188,7 +188,12 @@ autodiscover_peers() ->
 
 %%------------------------------------------------------------------------------
 repair_connection_pool(OldPoolTuple, Configuration) ->
-   NewHosts = sets:from_list(proplists:get_value(hosts, Configuration, []))
+    ConnectionsPerHost = proplists:get_value(connections_per_host, Configuration, 1)
+   ,HostsList = lists:flatmap(fun(_)-> lists:map(fun(HostAddress) -> HostAddress end,
+                                                proplists:get_value(hosts, Configuration, []))
+                             end,
+                             lists:seq(1, ConnectionsPerHost))
+  ,NewHosts = sets:from_list(lists:zip(HostsList, lists:seq(1, length(HostsList))))
   ,OldPool = tuple_to_list(OldPoolTuple)
   ,OldHosts = sets:from_list([Host || {Host, _Conn} <- OldPool])
   ,AllHosts = sets:union(NewHosts, OldHosts)
@@ -226,18 +231,18 @@ is_alive(Pid) ->
 .
 
 %%------------------------------------------------------------------------------
-add_connection(Host, Configuration) ->
-  case ecql_connection:start(Host, Configuration) of
+add_connection({HostAddress, Index}, Configuration) ->
+  case ecql_connection:start(HostAddress, Configuration) of
     {ok, Connection} ->
        Keyspace = proplists:get_value(keyspace, Configuration, "ecql")
       ,lists:foreach(
-         fun(Pid) -> init_query({Host, Pid}, ["USE ", Keyspace]) end
+         fun(Pid) -> init_query({HostAddress, Pid}, ["USE ", Keyspace]) end
         ,ecql_connection:get_streams(Connection)
       )
-      ,{connection_ok, {Host, Connection}}
+      ,{connection_ok, {{HostAddress, Index}, Connection}}
     ;
     Error ->
-       error_logger:error_msg("ecql: Failed connecting to: ~p: ~p~n", [Host, Error])
+       error_logger:error_msg("ecql: Failed connecting to: ~p-~f: ~p~n", [HostAddress, Index, Error])
       ,connection_failed
     %~
   end
