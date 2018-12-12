@@ -333,7 +333,8 @@ These can be configured from the application configuration file following OTP st
 | keyspace               | `"ecql"`           | Keyspace to be used by all connections & streams |
 | replication_strategy   | `"SimpleStrategy"` | Replication strategy to be used if keyspace does not yet exists and needs to be created. |
 | replication_factor     | `2`                | Replication factor to be used if keyspace does not yet exists and needs to be created. |
-| streams_per_connection | `100`              | Streams to open to each Server in the cluster |
+| streams_per_connection | `100`              | Streams to open for every Connection |
+| connections_per_host   | `1`                | Connections to open to each Server in the cluster |
 
 # Todo List
 
