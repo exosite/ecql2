@@ -29,6 +29,7 @@ ecql_test_() ->
 tests() ->
   [
     %~ {generator, fun ecql_mnesia_unit:tests/0},
+    {generator, fun ecql_foldl_unit:tests/0},
     {generator, fun ecql_prepared_unit:tests/0},
     {generator, fun ecql_batch_unit:tests/0},
     {generator, fun ecql_types_unit:tests/0}

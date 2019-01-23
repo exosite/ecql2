@@ -65,7 +65,11 @@ foldl(Id, Fun, Acc, Cql, Args, Consistency) ->
 .
 do_foldl({_, Pid} = Id, Fun, Acc, Cql, Args, Consistency) ->
    gen_server:cast(Pid, {query_start, <<>>, Cql, Args, Consistency})
-  ,do_foldl_recv(Id, Fun, Acc, Cql, Args, Consistency)
+  ,Current = erase(last_ccon)
+  ,Ret = do_foldl_recv(Id, Fun, Acc, Cql, Args, Consistency)
+  ,ecql:release()
+  ,put(last_ccon, Current)
+  ,Ret
 .
 do_foldl_recv({_, Pid} = Id, Fun, Acc, Cql, Args, Consistency) ->
   case gen_server:call(Pid, query_receive, ?TIMEOUT) of
