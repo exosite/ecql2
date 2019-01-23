@@ -9,6 +9,7 @@ setup() ->
   ,{ok, Ip} = file:read_file(".eunit/cassandra.ip")
   ,{ok, Host} = inet_parse:address(string:chomp(binary_to_list(Ip)))
   ,EcqlOpt = [
+    {autodiscover, false},
     {replication_strategy, "SimpleStrategy"},
     {replication_factor, 1},
     {keyspace, "test"},
