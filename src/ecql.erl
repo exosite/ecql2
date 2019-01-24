@@ -171,9 +171,9 @@ data_centers("NetworkTopologyStrategy" = S, [{Name, Factor} | Rest]) ->
 %%------------------------------------------------------------------------------
 autodiscover_peers() ->
   case catch begin
-     {_, [Row]} = ecql:select("SELECT cluster_name, data_center, rpc_address, partitioner, tokens FROM system.local")
+     {_, [Row]} = ecql:select("SELECT cluster_name, data_center, broadcast_address, partitioner, tokens FROM system.local")
     ,[_ClusterName, DataCenter, Addr0, _Partitioner, _Token] = Row
-    ,{_, Peers} = ecql:select("SELECT rpc_address, tokens FROM system.peers WHERE data_center = ? ALLOW FILTERING", [DataCenter])
+    ,{_, Peers} = ecql:select("SELECT broadcast_address, tokens FROM system.peers WHERE data_center = ? ALLOW FILTERING", [DataCenter])
     ,Hosts = lists:foldl(fun([Addr, _Tokens], List) ->
        [{Addr, 9042} | List]
      end, [{Addr0, 9042}], Peers)
