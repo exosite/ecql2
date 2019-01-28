@@ -57,6 +57,7 @@
   ,execute_batch/4
   ,eval/1
   ,eval_all/1
+  ,host/0
   ,quote/1
   ,release/0
   ,select/1
@@ -171,12 +172,9 @@ data_centers("NetworkTopologyStrategy" = S, [{Name, Factor} | Rest]) ->
 %%------------------------------------------------------------------------------
 autodiscover_peers() ->
   case catch begin
-     {_, [Row]} = ecql:select("SELECT cluster_name, data_center, rpc_address, partitioner, tokens FROM system.local")
-    ,[_ClusterName, DataCenter, Addr0, _Partitioner, _Token] = Row
-    ,{_, Peers} = ecql:select("SELECT rpc_address, tokens FROM system.peers WHERE data_center = ? ALLOW FILTERING", [DataCenter])
-    ,Hosts = lists:foldl(fun([Addr, _Tokens], List) ->
-       [{Addr, 9042} | List]
-     end, [{Addr0, 9042}], Peers)
+     DataCenter = ecql:select_value("SELECT data_center FROM system.local")
+    ,Peers = ecql:select_column("SELECT rpc_address FROM system.peers WHERE data_center = ? ALLOW FILTERING", 1, [DataCenter])
+    ,Hosts = [{Addr, 9042} || Addr <- [ecql:host() | Peers]]
     ,{ok, Hosts}
   end of 
     {ok, H} -> {autodiscover, H};
@@ -434,6 +432,11 @@ foreach(Fun, Cql, Args, Consistency) ->
 .
 
 %%------------------------------------------------------------------------------
+host() ->
+  with_stream_do(host, [])
+.
+%%------------------------------------------------------------------------------
+
 release() ->
   case get(last_ccon) of
      undefined ->
@@ -674,7 +677,6 @@ log({error, Code, Message} = Ret, Function, Args) ->
 log(Ret, _Function, _Args) ->
   Ret
 .
-
 
 %%==============================================================================
 %% END OF FILE

@@ -13,6 +13,7 @@
 %% Public API
 -export([
    foldl/6
+  ,host/1
   ,query/4
   ,query_async/4
   ,query_batch/5
@@ -197,6 +198,11 @@ sync({_, Pid}) ->
   gen_server:call(Pid, sync, ?TIMEOUT)
 .
 
+%%------------------------------------------------------------------------------
+host({_, Pid}) ->
+  gen_server:call(Pid, host, ?TIMEOUT)
+.
+
 %%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 %% Private loading
 %%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -260,6 +266,9 @@ handle_call(release, _From, State = #state{connection = Conn, monitor_ref = Moni
 ;
 handle_call(sync, _From, State) ->
   {reply, ok, wait_async(State)}
+;
+handle_call(host, _From, State = #state{host = Host}) ->
+  {reply, Host, State}
 .
 
 %%------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ setup() ->
   ,{ok, Ip} = file:read_file(".eunit/cassandra.ip")
   ,{ok, Host} = inet_parse:address(string:chomp(binary_to_list(Ip)))
   ,EcqlOpt = [
-    {autodiscover, false},
+    {autodiscover, true},
     {replication_strategy, "SimpleStrategy"},
     {replication_factor, 1},
     {keyspace, "test"},
@@ -30,6 +30,7 @@ tests() ->
   [
     %~ {generator, fun ecql_mnesia_unit:tests/0},
     {generator, fun ecql_foldl_unit:tests/0},
+    {generator, fun ecql_util_unit:tests/0},
     {generator, fun ecql_prepared_unit:tests/0},
     {generator, fun ecql_batch_unit:tests/0},
     {generator, fun ecql_types_unit:tests/0}
