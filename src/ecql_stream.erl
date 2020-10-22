@@ -5,8 +5,8 @@
 %%==============================================================================
 -module(ecql_stream).
 -behaviour(gen_server).
--compile(inline).
--compile({inline_size,   100}).
+% -compile(inline).
+% -compile({inline_size,   100}).
 -on_load(init/0).
 
 

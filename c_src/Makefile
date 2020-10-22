@@ -6,8 +6,8 @@ BASEDIR := $(abspath $(CURDIR)/..)
 PROJECT := ecql_stream
 
 ERTS_INCLUDE_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts/erts-~ts/include/\", [code:root_dir(), erlang:system_info(version)]).")
-ERL_INTERFACE_INCLUDE_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts\", [code:lib_dir(erl_interface, include)]).")
-ERL_INTERFACE_LIB_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts\", [code:lib_dir(erl_interface, lib)]).")
+ERL_INTERFACE_INCLUDE_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts\", [code:lib_dir(ei, include)]).")
+ERL_INTERFACE_LIB_DIR ?= $(shell erl -noshell -s init stop -eval "io:format(\"~ts\", [code:lib_dir(ei, lib)]).")
 
 C_SRC_DIR = $(CURDIR)
 C_SRC_OUTPUT ?= $(CURDIR)/../priv/$(PROJECT).so
@@ -34,7 +34,7 @@ CFLAGS += -fPIC -I $(ERTS_INCLUDE_DIR) -I $(ERL_INTERFACE_INCLUDE_DIR)
 CFLAGS += -fomit-frame-pointer -fno-strict-aliasing
 CXXFLAGS += -fPIC -I $(ERTS_INCLUDE_DIR) -I $(ERL_INTERFACE_INCLUDE_DIR)
 
-LDLIBS += -L $(ERL_INTERFACE_LIB_DIR) -lerl_interface -lei
+LDLIBS += -L $(ERL_INTERFACE_LIB_DIR) -lei
 LDFLAGS += -shared
 
 # Verbosity.

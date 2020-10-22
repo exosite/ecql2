@@ -12,6 +12,9 @@
 #define ASSERT(X)
 #endif
 
+int load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info);
+int upgrade(ErlNifEnv* env, void** priv_data, void** old_priv_data, ERL_NIF_TERM load_info);
+void unload(ErlNifEnv* env, void* priv_data);
 
 static ERL_NIF_TERM read_rows(ErlNifEnv* env, ERL_NIF_TERM bin_term, char *data, unsigned data_size, int* types, unsigned type_size);
 static inline int convert(ErlNifEnv* env, ERL_NIF_TERM bin_term, char* data_start, char *col_value, int32_t col_size, int type, ERL_NIF_TERM *term);
